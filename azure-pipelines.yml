@@ -10,9 +10,19 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
+# Cache .yarn/cache for faster installs
+- task: Cache@2
+  displayName: Cache .yarn/cache
+  inputs:
+      key: 'yarn | $(Agent.OS) | yarn.lock'
+      restoreKeys: |
+        yarn | $(Agent.OS)
+        yarn
+      path: .yarn/cache
+      
 - task: NodeTool@0
   inputs:
-    versionSpec: '18.x'
+    versionSpec: '18.13.0'
   displayName: 'Install Node.js'
 # Enable Corepack
 - task: CmdLine@2
