@@ -55,13 +55,19 @@ export class UserService {
       });
       if (!user) {
         const hashPassword = await bcrypt.hash(body.password, Salt);
-        return this.userRepository.save({
+        const user = await this.userRepository.save({
           firstName: body.firstName,
           lastName: body.lastName,
           email: body.email,
           password: hashPassword,
           createdDate: new Date().toLocaleString(),
         });
+        return {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          createDate: user.createdDate
+        }
       } else return 'Email already exists in system.';
     } catch (error) {
       throw error;

@@ -6,7 +6,7 @@ export class Conversation {
     @PrimaryGeneratedColumn('increment')
     id: number;
 
-    @OneToMany(() => Message, (message) => message.conversation )
+    @OneToMany(() => Message, (message) => message.conversation, {onDelete: 'CASCADE'})
     messages: string;
 
     @Column()
@@ -14,4 +14,7 @@ export class Conversation {
 
     @Column()
     createdDate: string;
+     
+    @Column()
+    userId: number;
 }
