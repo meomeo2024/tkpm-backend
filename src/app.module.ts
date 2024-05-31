@@ -7,7 +7,7 @@ import { MessageController } from './message/message.controller';
 import { MessageModule } from './message/message.module';
 @Module({
   imports: [UserModule, DatabaseModule, MessageModule],
-  controllers: [AppController, MessageController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}

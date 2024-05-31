@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Conversation } from "./conversation.entity";
 
-enum actor {
+export enum actor {
     Bot = 'bot',
     Human = 'human'
 }
