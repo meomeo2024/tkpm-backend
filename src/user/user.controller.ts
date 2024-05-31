@@ -28,6 +28,6 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Get('profile')
   async getUser(@Request() req) {
-    return req?.user;
+    return this.userService.getProfile(req.user.id);
   }
 }
