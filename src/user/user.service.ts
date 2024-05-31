@@ -11,6 +11,7 @@ import { User } from './entity/user.entity';
 import * as bcrypt from 'bcrypt';
 import { Salt, SecretKey } from 'src/constant/constant';
 import { JwtService } from '@nestjs/jwt';
+import { first } from 'rxjs';
 @Injectable()
 export class UserService {
   constructor(
@@ -64,6 +65,25 @@ export class UserService {
       } else return 'Email already exists in system.';
     } catch (error) {
       throw error;
+    }
+  }
+
+  async getProfile(id : number) {
+    try {
+      const user = await this.userRepository.findOne({
+        where: {
+          id: id
+        },
+
+      });
+      return {
+        email: user.email,
+        id: id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      }
+    } catch (error) {
+      
     }
   }
 }
