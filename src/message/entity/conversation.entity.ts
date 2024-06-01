@@ -1,10 +1,10 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { Message } from "./message.entity";
 
 @Entity()
 export class Conversation {
-    @PrimaryGeneratedColumn('increment')
-    id: number;
+    @PrimaryColumn()
+    conversationId: string;
 
     @OneToMany(() => Message, (message) => message.conversation, {onDelete: 'CASCADE'})
     messages: string;

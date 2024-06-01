@@ -1,8 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { Message, actor } from './entity/message.entity';
 import { MessageDto } from './dto/push-message.dto';
 import { Conversation } from './entity/conversation.entity';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class MessageService {
@@ -14,32 +15,35 @@ export class MessageService {
     ) { }
 
     async pushMessage(body: MessageDto, userId: number) {
-        let conversationId = body.conversationId;
+        let conversationId = body?.conversationId;
         let conversationTitle;
+
         if (!body.conversationId) {
             const payload = {
+                conversationId: uuidv4(),
                 title: body.content.length > 20 ? body.content.substring(0, 20) : body.content,
                 userId: userId,
                 createdDate: new Date().toLocaleString()
             }
             const conversation = await this.conversationRepository.save(payload);
-            conversationId = conversation.id;
+            conversationId = conversation.conversationId;
             conversationTitle = conversation.title;
         }
         if (!conversationTitle) {
             const conversation = await this.conversationRepository.findOne({
                 where: {
-                    id: conversationId
+                    conversationId: body.conversationId
                 }
             })
             conversationTitle = conversation.title;
         }
         const humanMessagePayload = {
             content: body.content,
+            messageId: uuidv4(),
             actor: actor.Human,
             userId: userId,
             conversation: {
-                id: conversationId
+             conversationId: conversationId
             },
             createdDate: new Date().toLocaleString()
         }
@@ -49,8 +53,9 @@ export class MessageService {
         const botMessagePayload = {
             content: 'OK',
             actor: actor.Bot,
+            messageId : uuidv4(),
             conversation: {
-                id: conversationId
+                conversationId: conversationId
             },
             createdDate: new Date().toLocaleString()
         }
@@ -58,26 +63,17 @@ export class MessageService {
         const messages = await this.messageRepository.find({
             where: {
                 conversation: {
-                    id: conversationId
+                    conversationId: body.conversationId
                 }
+            },
+            order: {
+                createdDate: 'ASC'
             }
         })
         return {
             title: conversationTitle,
             conversationId: conversationId,
-            content: messages.map(message => {
-                delete message.id;
-                return message.userId !== null
-                    ?
-                    message
-                    :
-                    {
-                        content: message.content,
-                        actor: message.actor,
-                        createdDate: message.createdDate
-                    }
-
-            })
+            content: await this.formatMessages(messages)
         }
     }
 
@@ -89,9 +85,51 @@ export class MessageService {
                 }
             })
             return conversations;
-
         } catch (error) {
-
+            throw error;
         }
+    }
+
+    async getDetailConversation(conversationId : string){
+        try {
+            const messages = await this.messageRepository.find({
+                where : {
+                    conversation : {
+                        conversationId : conversationId
+                    }
+                },
+                order : {
+                    createdDate: 'ASC'
+                }
+            })
+            const conversation = await this.conversationRepository.findOne({
+                where : {
+                    conversationId : conversationId
+                }
+            })
+            return {
+                title : conversation.title,
+                conversationId: conversation.conversationId,
+                content : await this.formatMessages(messages)
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async formatMessages(messages : any[]){
+         return messages.map(message => {
+            return message.userId !== null
+                ?
+                message
+                :
+                {
+                    messageId: message.messageId,
+                    content: message.content,
+                    actor: message.actor,
+                    createdDate: message.createdDate
+                }
+
+        })
     }
 }

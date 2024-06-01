@@ -9,6 +9,12 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+  // Enable CORS
+  app.enableCors({
+    origin: 'http://localhost:2999',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
   await app.listen(3000, ()=> {
     Logger.log(`Server is runing on port 3000`);
   });

@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Inject,
   Injectable,
   NotFoundException,
@@ -68,7 +69,7 @@ export class UserService {
           email: user.email,
           createDate: user.createdDate
         }
-      } else return 'Email already exists in system.';
+      } else throw new ConflictException('Email already exists in system.');
     } catch (error) {
       throw error;
     }
