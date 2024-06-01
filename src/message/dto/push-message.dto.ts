@@ -8,6 +8,6 @@ export class MessageDto {
     content: string;
 
     @IsOptional()
-    @IsNumber()
-    conversationId: number;
+    @IsString()
+    conversationId: string;
 }

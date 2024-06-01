@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { Conversation } from "./conversation.entity";
 
 export enum actor {
@@ -8,8 +8,8 @@ export enum actor {
 
 @Entity()
 export class Message {
-    @PrimaryGeneratedColumn('increment')
-    id: number;
+   @PrimaryColumn()
+    messageId: string;
 
     @Column()
     content: string;

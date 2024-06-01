@@ -1,4 +1,4 @@
-import { Body, Controller, Request, Post, UseGuards, Get } from '@nestjs/common';
+import { Body, Controller, Request, Post, UseGuards, Get, Param } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { MessageDto } from './dto/push-message.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -18,5 +18,11 @@ export class MessageController {
     @Get('conversations')
     async getListConversation(@Request() req) {
         return this.messageService.getListConversation(req.user.id);
+    }
+
+    @UseGuards(AuthGuard)
+    @Get('conversation/detail')
+    async getDetailConversation(@Param('conversationId') conversationId: string){
+        return this.messageService.getDetailConversation(conversationId);
     }
 }
