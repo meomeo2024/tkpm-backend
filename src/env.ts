@@ -21,5 +21,8 @@ export const env = {
   azureDictionaryUrl: getOsEnv('azure_dictionary_url'),
   azureTranslateAndDictionaryKey: getOsEnv('azure_translate_and_dictionary_key'),
   azureTranslateAndDictionaryRegion: getOsEnv('azure_translate_and_dictionary_region'),
-  azureLanguagesSupportedUrl: getOsEnv('azure_languges_supported_url')
+  azureLanguagesSupportedUrl: getOsEnv('azure_languges_supported_url'),
+  azureOpenAiUrl: getOsEnv('azure_open_ai_url'),
+  azureOpenAiToken: getOsEnv('azure_open_ai_token'),
+  azureOpenAiProjectId: getOsEnv('azure_open_ai_project_id')
 };

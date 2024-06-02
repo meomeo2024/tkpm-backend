@@ -4,6 +4,8 @@ import { Message, actor } from './entity/message.entity';
 import { MessageDto } from './dto/push-message.dto';
 import { Conversation } from './entity/conversation.entity';
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
+import { env } from 'src/env';
 
 @Injectable()
 export class MessageService {
@@ -43,17 +45,19 @@ export class MessageService {
             actor: actor.Human,
             userId: userId,
             conversation: {
-             conversationId: conversationId
+                conversationId: conversationId
             },
             createdDate: new Date().toLocaleString()
         }
         await this.messageRepository.save(humanMessagePayload);
 
-        // chat bot...
+        // Get message from openai
+        const botMessage = await this.sendOpenAiMessage(conversationId);
+
         const botMessagePayload = {
-            content: 'OK',
+            content: botMessage,
             actor: actor.Bot,
-            messageId : uuidv4(),
+            messageId: uuidv4(),
             conversation: {
                 conversationId: conversationId
             },
@@ -63,7 +67,7 @@ export class MessageService {
         const messages = await this.messageRepository.find({
             where: {
                 conversation: {
-                    conversationId: body.conversationId
+                    conversationId: conversationId
                 }
             },
             order: {
@@ -74,6 +78,44 @@ export class MessageService {
             title: conversationTitle,
             conversationId: conversationId,
             content: await this.formatMessages(messages)
+        }
+    }
+
+    async sendOpenAiMessage(conversationId: string) {
+        try {
+            let messages: any = await this.messageRepository.find({
+                where: {
+                    conversation: {
+                        conversationId: conversationId
+                    }
+                },
+                order: {
+                    createdDate: 'ASC'
+                }
+            });
+            messages = await messages.map(item => {
+                return {
+                    role: item.actor === 'human' ? 'user' : 'assistant',
+                    content: item.content
+                }
+            })
+            const response = await axios({
+                method: 'post',
+                url: env.azureOpenAiUrl,
+                headers: {
+                    'Authorization': 'Bearer ' + env.azureOpenAiToken,
+                    'OpenAI-Project': env.azureOpenAiProjectId,
+                    "Content-Type": 'application/json'
+                },
+                data: {
+                    model: 'gpt-3.5-turbo',
+                    messages: messages
+                }
+            });
+            const botMessage = response.data?.choices[0]?.message?.content;
+            return botMessage;
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -90,35 +132,35 @@ export class MessageService {
         }
     }
 
-    async getDetailConversation(conversationId : string){
+    async getDetailConversation(conversationId: string) {
         try {
             const messages = await this.messageRepository.find({
-                where : {
-                    conversation : {
-                        conversationId : conversationId
+                where: {
+                    conversation: {
+                        conversationId: conversationId
                     }
                 },
-                order : {
+                order: {
                     createdDate: 'ASC'
                 }
             })
             const conversation = await this.conversationRepository.findOne({
-                where : {
-                    conversationId : conversationId
+                where: {
+                    conversationId: conversationId
                 }
             })
             return {
-                title : conversation.title,
+                title: conversation.title,
                 conversationId: conversation.conversationId,
-                content : await this.formatMessages(messages)
+                content: await this.formatMessages(messages)
             }
         } catch (error) {
             throw error;
         }
     }
 
-    async formatMessages(messages : any[]){
-         return messages.map(message => {
+    async formatMessages(messages: any[]) {
+        return messages.map(message => {
             return message.userId !== null
                 ?
                 message
