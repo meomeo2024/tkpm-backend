@@ -21,7 +21,7 @@ export class MessageController {
     }
 
     @UseGuards(AuthGuard)
-    @Get('conversation/detail')
+    @Get('conversations/:conversationId')
     async getDetailConversation(@Param('conversationId') conversationId: string){
         return this.messageService.getDetailConversation(conversationId);
     }
