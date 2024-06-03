@@ -30,4 +30,10 @@ export class UserController {
   async getUser(@Request() req) {
     return this.userService.getProfile(req.user.id);
   }
+
+  @UseGuards(AuthGuard)
+  @Post('refresh-token')
+  async refreshToken(@Request() req){
+    return this.userService.refreshToken(req.user);
+  }
 }

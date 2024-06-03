@@ -39,9 +39,37 @@ export class UserService {
             secret: SecretKey,
             expiresIn: 60 * 60,
           }),
+          refreshToken: await this.jwtService.sign(
+            {
+              id: user.id
+            }, {
+            secret : SecretKey,
+            expiresIn: 60 * 60 * 24
+          })
         };
       }
       return new UnauthorizedException('Password is invalid');
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async refreshToken(user : any){
+    try {
+      const userDB = await this.userRepository.findOne({
+        where:{
+          id: user.id
+        }
+      })
+      return {
+        accessToken: await this.jwtService.sign({
+          email: userDB?.email,
+          id: userDB?.id
+        }, {
+          secret : SecretKey,
+          expiresIn: 60 * 60 
+        })
+      }
     } catch (error) {
       throw error;
     }
