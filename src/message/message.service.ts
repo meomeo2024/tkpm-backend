@@ -143,17 +143,17 @@ export class MessageService {
                 order: {
                     createdDate: 'ASC'
                 }
-            })
+            });
             const conversation = await this.conversationRepository.findOne({
                 where: {
                     conversationId: conversationId
                 }
-            })
+            });
             return {
                 title: conversation.title,
                 conversationId: conversation.conversationId,
                 content: await this.formatMessages(messages)
-            }
+            };
         } catch (error) {
             throw error;
         }
