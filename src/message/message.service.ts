@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { IsNull, Repository } from 'typeorm';
 import { Message, actor } from './entity/message.entity';
 import { MessageDto } from './dto/push-message.dto';
@@ -132,8 +132,19 @@ export class MessageService {
         }
     }
 
-    async getDetailConversation(conversationId: string) {
+    async getDetailConversation(conversationId: string, userId: number) {
         try {
+            const conversation = await this.conversationRepository.findOne({
+                where: {
+                    conversationId: conversationId
+                }
+            });
+            if (!conversation){
+                throw new NotFoundException('Invalid conversationId');
+            }
+            if(conversation && conversation.userId != userId){
+                throw new ForbiddenException(`Can't access this conversation`);
+            }
             const messages = await this.messageRepository.find({
                 where: {
                     conversation: {
@@ -144,11 +155,7 @@ export class MessageService {
                     createdDate: 'ASC'
                 }
             });
-            const conversation = await this.conversationRepository.findOne({
-                where: {
-                    conversationId: conversationId
-                }
-            });
+            
             return {
                 title: conversation.title,
                 conversationId: conversation.conversationId,
