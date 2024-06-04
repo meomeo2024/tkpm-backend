@@ -5,8 +5,9 @@ import { SpeechToTextDto } from './dto/speech-to-text.dto';
 import { TranslatorDto } from './dto/translator.dto';
 import { DictionaryDto } from './dto/dictionary.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Thirdparty API')
 @Controller('azure-speech')
 export class AzureSpeechController {
     constructor(private readonly azureSpeechService: AzureSpeechService){}

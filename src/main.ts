@@ -37,7 +37,7 @@ async function bootstrap() {
       },
       'access-token', // This name here is important for matching up with @ApiBearerAuth() in your controller!
     )
-    .addTag('Server API')
+    
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

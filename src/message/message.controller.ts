@@ -2,8 +2,9 @@ import { Body, Controller, Request, Post, UseGuards, Get, Param } from '@nestjs/
 import { MessageService } from './message.service';
 import { MessageDto } from './dto/push-message.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Conversation message')
 @Controller('')
 export class MessageController {
     constructor(private readonly messageService: MessageService) {}
