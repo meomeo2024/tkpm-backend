@@ -108,7 +108,7 @@ export class MessageService {
                     "Content-Type": 'application/json'
                 },
                 data: {
-                    model: 'gpt-3.5-turbo',
+                    model: 'gpt-4',
                     messages: messages
                 }
             });
